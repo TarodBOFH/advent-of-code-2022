@@ -1,12 +1,11 @@
 package org.tarodbofh.advent
 
-import kotlin.coroutines.coroutineContext
-
 private fun String.asInt() = this.toIntOrNull() ?: 0
 
 fun main() {
     day1()
     day2()
+    day3()
 }
 
 
@@ -72,6 +71,25 @@ enum class Results(val string: String) {
     }
 }
 
+fun day3() {
+    val lines = getResourceAsStream("/input3.txt").lines().filterNot { it.isEmpty() }
+    println(lines.sumOf {
+        it.chunked(it.length / 2).let { chunked ->
+            chunked.first().first { c -> chunked[1].contains(c) }.itemPriority()
+        }
+    })
+
+    println(lines.chunked(3).map { chunks ->
+        with(chunks[1].toSet() to chunks[2].toSet()) { // only create the sets once per triad
+            chunks[0].toSet().first { it in first && it in second }
+        }
+    }.sumOf { it.itemPriority() })
+}
+
+private fun Char.itemPriority() =  when {
+    isUpperCase() -> code - 38 // char codes start on UPPER case...
+    else -> code - 96
+}
 
 private val singleton = object {}
 fun getResourceAsStream(path: String): String = singleton.javaClass.getResource(path)?.readText()!!
